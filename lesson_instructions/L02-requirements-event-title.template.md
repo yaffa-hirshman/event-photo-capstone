@@ -1,6 +1,6 @@
 # Requirements — Rename event title (L-02)
 
-**Student:** (Yaffi Hirshman)  **Date:** 24-10-2026 **Fork URL:** https://github.com/yaffa-hirshman/event-photo-capstone
+**Student:** Yaffi Hirshman  **Date:** 24-10-2026 **Fork URL:** https://github.com/yaffa-hirshman/event-photo-capstone
 
 ## 1. Original request (do not reinterpret)
  הכנסתי שם אירוע שגוי. אני רוצה לתקן את שם האירוע שמוצג בגלריה של הלקוחה

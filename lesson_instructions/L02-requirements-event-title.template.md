@@ -1,71 +1,102 @@
 # Requirements — Rename event title (L-02)
 
-**Student:** ...  **Date:** ...  **Fork URL:** ...
+**Student:** (Yaffi Hirshman)  **Date:** 24-10-2026 **Fork URL:** https://github.com/yaffa-hirshman/event-photo-capstone
 
 ## 1. Original request (do not reinterpret)
-> I entered the wrong event name. I want to be able to change the event name displayed in the client's gallery.
+ הכנסתי שם אירוע שגוי. אני רוצה לתקן את שם האירוע שמוצג בגלריה של הלקוחה
 
 ## 2. Current behavior — verified facts
-| Claim | Evidence: file/function/line or HTTP result | Verified? |
+
+| טענה | ראיה | אומת? |
 | --- | --- | --- |
-| Event title exists in data model | | |
-| Current client gallery presents title | | |
-| No rename endpoint exists in inspected route file | | |
+| לאירוע יש שדה שם במודל הנתונים | `src/domain/types.ts`, בתוך `EventRecord`, השורה `title: string;` | כן, נקרא בקוד |
+| הגלריה של הלקוחה מציגה את השם | `src/services/event-service.ts`, בפונקציה `getClientGallery`, השורה `title: event.title,`. נקראת מהנתיב `GET /client/events/:eventId/gallery` ב-`src/http/app.ts` | כן, נקרא בקוד |
+| לא נמצא נתיב לשינוי שם בקובץ הנתיבים | ב-`src/http/app.ts` יש רק: `GET /health`, `GET /api/events`, `GET /api/events/:eventId/gallery`, `GET /client/events/:eventId/gallery`, `POST /api/events/:eventId/selections`. ה-POST שומר בחירות תמונות ולא שם. ב-`event-service.ts` אין פונקציה שמעדכנת אירוע. | כן, בקבצים שקראתי. לא חיפשתי בכל המאגר. |
+| בנתוני הדוגמה יש אירוע בשם Cohen Wedding | `src/data/memory-store.ts`, במערך `events`, השורה `title: "Cohen Wedding",` | כן, נקרא בקוד |
+| אין בדיקה קיימת לשינוי שם | ב-`tests/event-api.test.ts` יש 5 בדיקות ואף אחת לא נוגעת ב-`title`. הרצת `npm test`: 5 עברו. | כן, נקרא בקוד ובהרצה |
 
 ## 3. Actors / users / use cases / permissions
-- Verified:
-- Must clarify:
+- מאומת:
+  - בקוד יש שני סוגי משתמשים: צלמת (כותרת `x-photographer-id`) ולקוחה (כותרת `x-client-id`), בקובץ `src/http/app.ts`.
+  - צלמת ניגשת רק לאירועים שלה (`findEventForPhotographer` ב-`src/data/memory-store.ts`).
+  - לקוחה ניגשת רק לגלריה של האירוע שלה (`findClientEvent` באותו קובץ).
+  - ההזדהות היא הדגמה בלבד ולא אימות אמיתי (הערה ב-`app.ts`, והמגבלה הראשונה ב-`README.md`).
+- דורש בירור:
+  - מי רשאי לשנות שם אירוע: צלמת בלבד, או גם לקוחה?
+  - מי מבצע את התיקון בפועל? הבקשה כתובה מנקודת המבט של הלקוחה.
 
 ## 4. Goal, scope, out of scope
-- Goal:
-- In scope (confirmed):
-- Out of scope (confirmed):
-- Undecided:
+- Goal: אפשר לתקן את שם האירוע שמוצג בגלריה של הלקוחה.
+- In scope (confirmed): השם המוצג בגלריה של הלקוחה, כפי שכתוב בבקשה המקורית.
+- Out of scope (confirmed): עדיין לא אושר דבר. באופן זמני מחוץ לתחום: הודעה ללקוחה על השינוי (הצעת AI שנדחתה בשלב זה).
+- Undecided: האם השם החדש משתנה גם ברשימת האירועים של הצלמת ובגלריה שלה; האם נשמרים שמות קודמים; האם גלריה שלא פורסמה נכללת.
 
 ## 5. Functional requirements
-- FR-1: [Only after clarification; mark provisional where needed]
+- FR-1 (זמנית, תלויה בהחלטה על הרשאות): משתמשת מורשית יכולה לשנות את שם האירוע, ואז הגלריה של הלקוחה מציגה את השם החדש.
+- FR-2: עדיין לא הוגדרה, בהמתנה להחלטות בסעיף 12.
 
 ## 6. Non-functional requirements / constraints
-- NFR-1: [Only when justified; otherwise unresolved]
+- NFR-1: לא הוכרעה. אין עדיין דרישה לא פונקציונלית מוצדקת.
+- מגבלות ידועות מהמאגר: הנתונים נשמרים בזיכרון ונמחקים כשהשרת מופעל מחדש (מגבלה 2 ב-`README.md`); אין בדיקת תוכן לשם, כי הטיפוס הוא רק `string`; ההזדהות היא הדגמה בלבד.
 
 ## 7. Ten analysis lenses from the preparation assignment
-| Term | Question relevant to this change | Answer known? / evidence |
+
+| מושג | שאלה רלוונטית לשינוי | האם ידוע? / ראיה |
 | --- | --- | --- |
-| functional requirements | | |
-| non-functional requirements | | |
-| actors / users | | |
-| use cases | | |
-| constraints | | |
-| assumptions | | |
-| acceptance criteria | | |
-| ambiguity | | |
-| missing information | | |
-| scope | | |
+| functional requirements | מה בדיוק המערכת צריכה לעשות כשמתקנים שם? | חלקית: הגלריה של הלקוחה מציגה את השם החדש. הפרטים פתוחים. |
+| non-functional requirements | האם יש צורך בביצועים, תיעוד שינויים או אמינות? | לא ידוע. |
+| actors / users | מי רשאי לשנות שם אירוע? | לא ידוע. צלמת ולקוחה קיימות בקוד (`app.ts`). |
+| use cases | מי מתקן את השם ומתי? | לא ידוע. ידועה רק בקשת הלקוחה. |
+| constraints | האם יש הגבלה על אורך, ערך ריק או תווים? | לא ידוע. ב-`types.ts` השם הוא רק `string`, ולא נמצאה בדיקה. |
+| assumptions | מה אנחנו מניחות בלי הוכחה? | הנחה: צריך נתיב עדכון חדש. לא אומת, ולכן לא הוכרע. |
+| acceptance criteria | איך יודעים שזה עובד? | קריטריונים זמניים בסעיף 9. |
+| ambiguity | מה זה "שם שגוי"? | לא ברור: טעות הקלדה בלבד, או שינוי שם מלא? והאם גלריה שלא פורסמה נכללת? |
+| missing information | האם נדרשת היסטוריה? | לא ידוע. |
+| scope | באילו מקומות מופיע השם? | בקוד השם מופיע ב-`listEvents`, ב-`getGallery` וב-`getClientGallery` (ב-`event-service.ts`). אילו מהם צריכים להשתנות לא הוכרע. |
 
 ## 8. Questions, assumptions, ambiguities
-| Question or assumption | Why it matters | Evidence/status | Who decides? |
+
+| שאלה או הנחה | למה זה חשוב | ראיה / מצב | מי מחליט? |
 | --- | --- | --- | --- |
+| מי רשאי לשנות: צלמת בלבד, או גם לקוחה? | מגדיר הרשאות וסיכון לשינוי שגוי | פתוח. שני הגורמים קיימים ב-`app.ts`. | בעל המוצר |
+| מהו שם תקין (ריק, אורך מקסימלי, תווים מיוחדים)? | מונע נתונים לא תקינים | פתוח. ב-`types.ts` השם הוא רק `string`. | בעל המוצר |
+| האם השינוי חל בכל המקומות שבהם השם מופיע? | מגדיר את ה-Scope | פתוח. השם בשימוש בשלוש פונקציות ב-`event-service.ts`. | בעל המוצר |
+| האם לשמור את השם הקודם ומי ששינה? | משפיע על מבנה הנתונים ועל תיעוד | פתוח | בעל המוצר |
+| "שם שגוי": טעות הקלדה או שינוי מלא? האם גלריה שלא פורסמה נכללת? | מסיר עמימות | פתוח. `getClientGallery` לא מחזירה גלריה שלא פורסמה. | בעל המוצר / הלקוחה |
+| הנחה: נדרש נתיב PUT חדש | עלולה לנעול פתרון בטרם עת | לא אומת ולא אומצה. בחירת פתרון אינה בשלב הזה. | שלב העיצוב |
 
 ## 9. Acceptance criteria (provisional if decisions unresolved)
-- Given ..., when ..., then ...
-- Given ..., when ..., then ...
+- Given אירוע קיים ומשתמשת שהוסמכה לערוך אותו (זמני, תלוי בהחלטה על הרשאות), when שם האירוע משתנה לשם תקין, then הגלריה של הלקוחה מציגה את השם החדש.
+- Given אירוע קיים ובקשה עם שם ריק או לא תקין (זמני, תלוי בהחלטה על שם תקין), when מנסים לעדכן, then השם הקודם נשמר ומוחזרת הודעה מתאימה.
+- Given צלמת שהאירוע אינו שייך לה (זמני, תלוי בהחלטה על הרשאות), when היא מנסה לשנות את שמו, then השינוי נדחה והשם לא משתנה.
 
 ## 10. Error cases and tests
-- Unknown event:
-- Unauthorized requester:
-- Empty title:
-- Existing client gallery after change:
+- Unknown event: לא הוכרע. בנתיבים הקיימים מוחזר 404 לאירוע שלא נמצא (`app.ts`), ואפשר שזה יחול גם כאן.
+- Unauthorized requester: לא הוכרע. בנתיבים הקיימים מוחזר 401 כשחסרה הזדהות ו-404 לאירוע של צלמת אחרת (`app.ts` והבדיקות).
+- Empty title: לא הוכרע, תלוי בהחלטה על שם תקין.
+- Existing client gallery after change: זמני: הגלריה מציגה את השם החדש ורשימת התמונות לא משתנה.
 
 ## 11. AI checkpoints: understanding / questioning / spec review
-Record one claim you verified in source and at least two AI suggestions with adopted/rejected/open status.
+טענה שאומתה בקוד: שם האירוע בגלריה של הלקוחה מגיע מ-`event.title` בפונקציה `getClientGallery` (`src/services/event-service.ts`).
 
 ### AI question and spec review suggestions — reviewed critically
-| AI suggestion | Essential / later / irrelevant / unverified | Justification | Evidence |
+
+| הצעת AI | חיונית / לדחייה / לא רלוונטית / לא מאומתת | נימוק | ראיה |
 | --- | --- | --- | --- |
+| לשאול מהו שם תקין (ריק, אורך, תווים) | חיונית. סטטוס: אומצה | לשם אין היום בדיקת תוכן | `types.ts`: `title: string;`, ולא נמצאה בדיקה ב-`app.ts` או ב-`event-service.ts` |
+| לשלוח ללקוחה הודעה על שינוי השם | לדחייה. סטטוס: נדחתה בשלב זה | הבקשה עוסקת רק בתיקון השם המוצג | הבקשה המקורית בסעיף 1 |
+| לשמור היסטוריית שמות ומי ששינה | לדחייה. סטטוס: פתוחה | שימושי אבל לא נדרש בבקשה, ודורש החלטת מוצר | אין שדה היסטוריה ב-`EventRecord` (`types.ts`) |
+| נדרש נתיב PUT חדש | לא מאומתת. סטטוס: לא אומצה | זו בחירת פתרון, ואינה בשלב הזה. יכולות להיות דרכים אחרות. | לא נמצא נתיב כזה, אך שלב העיצוב יכריע |
+
+הערה: ההצעות נוסחו בעזרת AI, ובדקתי כל אחת מהן מול הקוד שקראתי.
 
 ## 12. Remaining decisions (do not silently invent answers)
--
+- מי רשאי לשנות שם אירוע.
+- מהו שם תקין.
+- האם השינוי חל בכל המקומות או רק בגלריה של הלקוחה.
+- האם נשמרים שמות קודמים ומי ששינה.
+- מה משמעות "שם שגוי", והאם גלריה שלא פורסמה נכללת.
 
 ## 13. Personal reflection
-- One fact discovered through code review:
-- One AI suggestion you rejected or postponed, and why:
+- עובדה אחת שגיליתי בעזרת סקירת הקוד: שם האירוע בגלריה של הלקוחה מגיע מ-`event.title` בפונקציה `getClientGallery` (`src/services/event-service.ts`), ולא מצאתי נתיב או פונקציה שמעדכנים שם.
+- הצעת AI אחת שדחיתי או דחיתי להמשך, ולמה: הודעה ללקוחה על השינוי. דחיתי כי הבקשה עוסקת רק בתיקון השם המוצג.
